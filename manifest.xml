@@ -73,7 +73,7 @@
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="GetStarted.Title" DefaultValue="נקדן דיקטה"/>
-        <bt:String id="CommandsGroup.Label" DefaultValue="Commands Group"/>
+        <bt:String id="CommandsGroup.Label" DefaultValue="נקדן דיקטה"/>
         <bt:String id="TaskpaneButton.Label" DefaultValue="נקדן דיקטה"/>
       </bt:ShortStrings>
       <bt:LongStrings>
