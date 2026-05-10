@@ -327,41 +327,57 @@ if (!isOnline) {
   };
 
   const handleNikudClick = async () => {
-    setIsLoading(true); setIsManualMode(false);
-    try {
-      let textToNikud = "";
-      await Word.run(async (context) => {
-        let selection = context.document.getSelection();
-        selection.load("text");
-        await context.sync();
-        
-        if (!selection.text || selection.text.trim() === "") {
-          const paragraph = selection.paragraphs.getFirstOrNullObject();
-          paragraph.load("text");
-          await context.sync();
-          
-          if (!paragraph.isNullObject && paragraph.text.trim() !== "") {
-            textToNikud = paragraph.text;
-            paragraph.getRange().select();
-            await context.sync();
-            // מיקום הסימניה הראשונית
-            context.document.getSelection().getRange("Start").insertBookmark("DictaSearchOrigin");
-            await context.sync();
-          }
-        } else {
-          textToNikud = selection.text;
-          selection.getRange("Start").insertBookmark("DictaSearchOrigin");
-          await context.sync();
-        }
-      });
+    setIsLoading(true); setIsManualMode(false);
+    try {
+      let textToNikud = "";
+      await Word.run(async (context) => {
+        let selection = context.document.getSelection();
+        selection.load("text");
+        await context.sync();
+        
+        // משיכת כל הפסקה כדי לקבל הקשר, גם אם סומנה מילה בודדת (ללא רווחים) או לא סומן כלום
+        if (!selection.text || selection.text.trim() === "" || selection.text.trim().indexOf(" ") === -1) {
+          const paragraph = selection.paragraphs.getFirstOrNullObject();
+          paragraph.load("text");
+          await context.sync();
+          
+          if (!paragraph.isNullObject && paragraph.text.trim() !== "") {
+            textToNikud = paragraph.text;
+            paragraph.getRange().select();
+            await context.sync();
+            // מיקום הסימניה הראשונית
+            context.document.getSelection().getRange("Start").insertBookmark("DictaSearchOrigin");
+            await context.sync();
+          }
+        } else {
+          textToNikud = selection.text;
+          selection.getRange("Start").insertBookmark("DictaSearchOrigin");
+          await context.sync();
+        }
+      });
 
-      if (!textToNikud || textToNikud.trim() === "") { setIsLoading(false); return; }
-      
-      const apiResponse = await fetchNakdan(textToNikud, apiSettings);
-      setWordsData(apiResponse.data);
-      await processNextWords(0, apiResponse.data, stopOnEveryWord);
-    } catch (error) { console.error(error); } finally { setIsLoading(false); }
-  };
+      if (!textToNikud || textToNikud.trim() === "") { setIsLoading(false); return; }
+      
+      // פיצול חכם (Chunking) למשפטים כדי למנוע שגיאות Timeout בשרת
+      const chunks = textToNikud.match(/[^.!?\n]+[.!?\n]*/g) || [textToNikud];
+
+      // יצירת מערך של בקשות מקבילות לדיקטה
+      const fetchPromises = chunks.map(chunk => {
+        const trimmedChunk = chunk.trim();
+        if (trimmedChunk.length === 0) return Promise.resolve({ data: [] });
+        return fetchNakdan(trimmedChunk, apiSettings);
+      });
+
+      // המתנה לכל התשובות מהשרת יחד
+      const results = await Promise.all(fetchPromises);
+      
+      // איחוד כל התוצאות (מערכים של מילים) למערך מילים אחד רציף (Flatten)
+      const combinedWordsData = results.flatMap(res => res.data);
+
+      setWordsData(combinedWordsData);
+      await processNextWords(0, combinedWordsData, stopOnEveryWord);
+    } catch (error) { console.error(error); } finally { setIsLoading(false); }
+  };
 
   const handleOptionSelect = async (cleanNikudText: string) => {
     try {
