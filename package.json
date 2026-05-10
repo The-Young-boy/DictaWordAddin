@@ -1,11 +1,12 @@
 {
-  "name": "office-addin-taskpane-react",
-  "version": "0.0.1",
+ "name": "dicta-word-addin",
+  "version": "1.0.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/OfficeDev/Office-Addin-TaskPane-React.git"
+    "url": "https://github.com/The-Young-boy/DictaWordAddin.git"
   },
-  "license": "MIT",
+  "license": "CC-BY-NC-4.0",
+  "homepage": "https://the-young-boy.github.io/DictaWordAddin/",
   "config": {
     "app_to_debug": "word",
     "app_type_to_debug": "desktop",
