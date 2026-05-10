@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0" xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="TaskPaneApp">
   <Id>ef674706-67a7-4abd-bb41-32cd0476862e</Id>
-  <Version>1.0.0.1</Version>
+  <Version>1.0.0.2</Version>
   <ProviderName>Contoso</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="נקדן דיקטה"/>
@@ -57,6 +57,26 @@
               </Group>
             </OfficeTab>
           </ExtensionPoint>
+          <ExtensionPoint xsi:type="ContextMenu">
+          <OfficeMenu id="ContextMenuText">
+            <Control xsi:type="Button" id="NikudContextMenuButton">
+              <Label resid="TaskpaneButton.Label" />
+              <Supertip>
+                <Title resid="TaskpaneButton.Label" />
+                <Description resid="TaskpaneButton.Tooltip" />
+              </Supertip>
+              <Icon>
+                <bt:Image size="16" resid="Icon.16x16" />
+                <bt:Image size="32" resid="Icon.32x32" />
+                <bt:Image size="80" resid="Icon.80x80" />
+              </Icon>
+              <Action xsi:type="ShowTaskpane">
+                <TaskpaneId resid="Taskpane.Id" />
+                <SourceLocation resid="Taskpane.Url" />
+              </Action>
+            </Control>
+          </OfficeMenu>
+        </ExtensionPoint>
         </DesktopFormFactor>
       </Host>
     </Hosts>
